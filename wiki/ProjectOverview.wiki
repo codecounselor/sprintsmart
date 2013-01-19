@@ -6,6 +6,6 @@ Coming Soon
 
 = Feature Backlog =
 
-# XML Config file to specify JIRA URL, label-color mappings, velocity marker settings, sprint details, number of sprints
-# Display status icons for story pending, in progress, complete
-# Add dates to sprint markers
+  # XML Config file to specify JIRA URL, label-color mappings, velocity marker settings, sprint details, number of sprints
+  # Display status icons for story pending, in progress, complete
+  # Add dates to sprint markers
