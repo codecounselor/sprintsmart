@@ -75,20 +75,12 @@ public class JiraConnector
           }
         }
 
-        stories.add(new UserStory(13, storyColor, storyName));
+        stories.add(new UserStory(5, storyColor, storyName));
       }
     } 
     catch (Exception e)
     {
       e.printStackTrace();
-      stories.add(new UserStory(5, Color.BLUE, "Story 1"));
-      stories.add(new UserStory(8, Color.RED, "Story 2"));
-      stories.add(new UserStory(13, Color.GREEN, "Story 3"));
-      stories.add(new UserStory(5, Color.CHOCOLATE, "Story 4"));
-      stories.add(new UserStory(20, Color.CORAL, "Story 5"));
-      stories.add(new UserStory(2, Color.CRIMSON, "Story 6"));
-      stories.add(new UserStory(20, Color.BLUE, "Story 7"));
-      stories.add(new UserStory(13, Color.GREEN, "Story 8"));
     }
   }
 
