@@ -15,7 +15,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-package org.sprintsmart.roadmap;
+package org.sprintsmart.roadmap.connectors;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -29,27 +29,28 @@ import javafx.scene.paint.Color;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.sprintsmart.roadmap.model.Label;
+import org.sprintsmart.roadmap.model.ProductBacklog;
+import org.sprintsmart.roadmap.model.UserStory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 public class JiraConnector
 {
-  private List<UserStory> stories = new ArrayList<UserStory>();
-  
+  private List<UserStory> stories = new ArrayList<UserStory>();  
   private Map<String, Color> label2Color = new HashMap<String,Color>();
   
-  public JiraConnector(String urlString) 
+  public JiraConnector(ProductBacklog productBacklogConfig) 
   {
-    label2Color.put("blue", Color.BLUE);
-    label2Color.put("qa-manual", Color.ORANGE);
-    label2Color.put("bughunt_js", Color.FIREBRICK);
+    for( Label label : productBacklogConfig.getLabelThemes().getLabel() )
+    {
+      label2Color.put(label.getValue(), Color.valueOf(label.getColor()));      
+    }
     
-    
-    String testurl = "https://jira.atlassian.com/sr/jira.issueviews:searchrequest-xml/36543/SearchRequest-36543.xml?tempMax=200&field=key&field=labels&field=story%20points&os_username=nsgood82&os_password=nsg123";
     try
     {
-      URL url = new URL(testurl);
+      URL url = new URL(productBacklogConfig.getRssFeed());
 
       InputStream is = url.openStream();
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -80,6 +81,14 @@ public class JiraConnector
     catch (Exception e)
     {
       e.printStackTrace();
+      stories.add(new UserStory(5, Color.BLUE, "Story 1"));
+      stories.add(new UserStory(8, Color.RED, "Story 2"));
+      stories.add(new UserStory(13, Color.GREEN, "Story 3"));
+      stories.add(new UserStory(5, Color.CHOCOLATE, "Story 4"));
+      stories.add(new UserStory(20, Color.CORAL, "Story 5"));
+      stories.add(new UserStory(2, Color.CRIMSON, "Story 6"));
+      stories.add(new UserStory(20, Color.BLUE, "Story 7"));
+      stories.add(new UserStory(13, Color.GREEN, "Story 8"));
     }
   }
 

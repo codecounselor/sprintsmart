@@ -17,8 +17,6 @@
 package org.sprintsmart.roadmap;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import javafx.application.Application;
@@ -41,6 +39,13 @@ import javafx.stage.Stage;
 
 import javax.imageio.ImageIO;
 
+import org.sprintsmart.roadmap.connectors.JiraConnector;
+import org.sprintsmart.roadmap.model.Marker;
+import org.sprintsmart.roadmap.model.ProductBacklog;
+import org.sprintsmart.roadmap.model.SprintRoadmap;
+import org.sprintsmart.roadmap.model.SprintRoadmapConfiguration;
+import org.sprintsmart.roadmap.model.UserStory;
+
 /**
  * 
  * @author nate
@@ -51,61 +56,10 @@ public class AgileRoadmapUI extends Application
   Canvas sprintMarkerCanvas;
   Canvas velocityMarkerCanvas;
   Canvas legendCanvas;
-  
-  static CanvasConfig canvasConfig;
-  
+
+  static CanvasContext canvasConfig;
+
   int currentStoryYPos;
-
-  
-  public void start(Stage primaryStage)
-  {
-    primaryStage.setTitle("Drawing Operations Test");
-
-    int requiredWidth = canvasConfig.getWidth();
-    int requiredHeight = canvasConfig.getHeight();    
-    
-    storyCanvas = new Canvas(requiredWidth, requiredHeight);
-    sprintMarkerCanvas = new Canvas(requiredWidth, requiredHeight);
-    velocityMarkerCanvas = new Canvas(requiredWidth, requiredHeight);
-    legendCanvas = new Canvas(requiredWidth, requiredHeight);
-    
-    drawMarkers(sprintMarkerCanvas.getGraphicsContext2D(), canvasConfig.getMarkers(), 4);
-    drawStories(storyCanvas.getGraphicsContext2D(), canvasConfig.getStories());
-
-    Group root = new Group();
-    root.getChildren().add(storyCanvas);
-    root.getChildren().add(sprintMarkerCanvas);
-    root.getChildren().add(velocityMarkerCanvas);
-    root.getChildren().add(legendCanvas);
-
-    sprintMarkerCanvas.toFront();
-
-    ScrollPane scrollPane = new ScrollPane();
-    scrollPane.setPrefSize(requiredWidth, requiredHeight);
-    scrollPane.setContent(root);
-    
-    //This doesn't render to a file correctly
-    Scene theScene = new Scene(scrollPane);
-
-    //Have to set the root if we want to create a file, to view interactively we must use a scroll pane though
-    //Scene theScene = new Scene(root);
-    
-    primaryStage.setScene(theScene);
-    primaryStage.show();
-    
-    try
-    {
-      WritableImage image = new WritableImage(requiredWidth, requiredHeight);
-      theScene.snapshot(image);
-      File file = new File("/Users/nate/Pictures/AgileMap.png");
-      ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
-    } 
-    catch (IOException e)
-    {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-  }
 
   /**
    * The main() method is ignored in correctly deployed JavaFX application.
@@ -118,26 +72,81 @@ public class AgileRoadmapUI extends Application
    */
   public static void main(String[] args)
   {
-    List<UserStory> stories = new ArrayList<UserStory>();
-    stories.add(new UserStory(5, Color.BLUE, "Story 1"));
-    stories.add(new UserStory(8, Color.RED, "Story 2"));
-    stories.add(new UserStory(13, Color.GREEN, "Story 3"));
-    stories.add(new UserStory(5, Color.CHOCOLATE, "Story 4"));
-    stories.add(new UserStory(20, Color.CORAL, "Story 5"));
-    stories.add(new UserStory(2, Color.CRIMSON, "Story 6"));
-    stories.add(new UserStory(20, Color.BLUE, "Story 7"));
-    stories.add(new UserStory(13, Color.GREEN, "Story 8"));
-    
-    stories = new JiraConnector("").getStories();
-
-    List<VelocityMarker> markers = new ArrayList<VelocityMarker>();
-    markers.add(new VelocityMarker("Release Deliverables/ @ Velocity=14", "Release Commit Level", 14, Color.GREEN));
-    markers.add(new VelocityMarker("Release Deliverables/ @ Velocity=20", "Potential Delivery Level", 20, Color.valueOf("RED")));
-    //markers.add(new VelocityMarker("Release Deliverables/ @ Velocity=16", "Current Delivery Level", 16, Color.YELLOW));
-    
-    canvasConfig = new CanvasConfig(stories, markers, 150, 300);
-    
     launch(args);
+  }
+
+  /**
+   * This method initializes the view with any arguments provided by the command
+   * line or JNLP configuration.
+   */
+  private void initialize() throws Exception
+  {
+    List<String> params = getParameters().getRaw();
+    String configFile = params.get(0); //"configFile"
+    SprintRoadmapConfiguration config = new SprintRoadmapConfiguration(configFile);
+    SprintRoadmap roadmap = config.getRoadmap();
+    
+    //TODO: support multiple
+    ProductBacklog productBacklog = roadmap.getProductBacklog().get(0);
+
+    List<UserStory> stories = new JiraConnector(productBacklog).getStories();
+    canvasConfig = new CanvasContext(stories, productBacklog.getVelocityMarkers().getMarker(), 150, 300);
+  }
+
+  public void start(Stage primaryStage)
+  {
+    try
+    {
+      initialize();
+
+      primaryStage.setTitle("Drawing Operations Test");
+
+      int requiredWidth = canvasConfig.getWidth();
+      int requiredHeight = canvasConfig.getHeight();
+
+      storyCanvas = new Canvas(requiredWidth, requiredHeight);
+      sprintMarkerCanvas = new Canvas(requiredWidth, requiredHeight);
+      velocityMarkerCanvas = new Canvas(requiredWidth, requiredHeight);
+      legendCanvas = new Canvas(requiredWidth, requiredHeight);
+
+      drawMarkers(sprintMarkerCanvas.getGraphicsContext2D(), canvasConfig.getMarkers(), 4);
+      drawStories(storyCanvas.getGraphicsContext2D(), canvasConfig.getStories());
+
+      Group root = new Group();
+      root.getChildren().add(storyCanvas);
+      root.getChildren().add(sprintMarkerCanvas);
+      root.getChildren().add(velocityMarkerCanvas);
+      root.getChildren().add(legendCanvas);
+
+      sprintMarkerCanvas.toFront();
+
+      ScrollPane scrollPane = new ScrollPane();
+      scrollPane.setPrefSize(requiredWidth, requiredHeight);
+      scrollPane.setContent(root);
+
+      // This doesn't render to a file correctly
+      Scene theScene = new Scene(scrollPane);
+
+      // Have to set the root if we want to create a file, to view interactively
+      // we must use a scroll pane though
+      // Scene theScene = new Scene(root);
+
+      primaryStage.setScene(theScene);
+      primaryStage.show();
+
+      WritableImage image = new WritableImage(requiredWidth, requiredHeight);
+      theScene.snapshot(image);
+      File file = new File("/Users/nate/Pictures/AgileMap.png");
+      ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
+    } 
+    catch (Exception e)
+    {
+      e.printStackTrace();
+    } 
+    finally
+    {
+
+    }
   }
 
   private void drawStories(GraphicsContext gc, List<UserStory> userStories)
@@ -191,19 +200,18 @@ public class AgileRoadmapUI extends Application
     if (useGradient)
     {
       gc.setFill(new LinearGradient(1, 1, 1, 0, true, CycleMethod.NO_CYCLE, new Stop(0.0, color), new Stop(1, Color.WHITE)));
-      //Only Add Border when using Gradients
+      // Only Add Border when using Gradients
       gc.strokeRect(xPosLeft, yPos, width, height);
       gc.strokePolygon(new double[] { xPosRight, xPosRight, xPosDepth, xPosDepth }, new double[] { yPos, yPos + height, yPos + height - depth, yPos - depth }, 4);
-    } 
-    else
+    } else
     {
       gc.setFill(color);
     }
-    
-    //Front
+
+    // Front
     gc.fillRect(xPosLeft, yPos, width, height);
-    
-    //3D Side
+
+    // 3D Side
     gc.fillPolygon(new double[] { xPosRight, xPosRight, xPosDepth, xPosDepth }, new double[] { yPos, yPos + height, yPos + height - depth, yPos - depth }, 4);
   }
 
@@ -215,56 +223,57 @@ public class AgileRoadmapUI extends Application
     gc.strokePolygon(new double[] { xPosLeft, xPosRight, xPosDepth, xPosLeft + depth }, new double[] { yPos, yPos, yPos - depth, yPos - depth }, 4);
   }
 
-  private void drawMarkers(GraphicsContext gc, List<VelocityMarker> markers, int sprintsUntilRelease)
+  private void drawMarkers(GraphicsContext gc, List<Marker> markers, int sprintsUntilRelease)
   {
     int width = canvasConfig.storyWidth;
     int markerCount = 0;
     int currentXPos = canvasConfig.storyXPos - canvasConfig.markerColumnPadding;
-    for (VelocityMarker marker : markers)
+    for (Marker marker : markers)
     {
-      //Draw the "watermark" on the story boxes
+      // Draw the "watermark" on the story boxes
       int yPos = canvasConfig.offsetY + marker.getVelocity() * canvasConfig.storyPointPixelFactor * sprintsUntilRelease;
-      draw3DRectangle(gc, marker.getColor(), canvasConfig.storyXPos-canvasConfig.markerColumnWidth, yPos, width+canvasConfig.markerColumnWidth, canvasConfig.markerHeight, canvasConfig.storyDepth, false);
-      gc.setFill(Color.BLACK);      
-      gc.fillText(marker.getText(), canvasConfig.storyXPos-canvasConfig.markerColumnWidth, yPos);
+      draw3DRectangle(gc, Color.valueOf(marker.getColor()), canvasConfig.storyXPos - canvasConfig.markerColumnWidth, yPos, width + canvasConfig.markerColumnWidth, canvasConfig.markerHeight, canvasConfig.storyDepth,
+          false);
+      gc.setFill(Color.BLACK);
+      gc.fillText(marker.getLabel(), canvasConfig.storyXPos - canvasConfig.markerColumnWidth, yPos);
 
-      //Render Title Box
+      // Render Title Box
       boolean arrowDirection = true;
       int arrowXPos = canvasConfig.storyXPos;
       int titleXPos;
-      //Boxes on the Left (first marker)
+      // Boxes on the Left (first marker)
       if (markerCount == 0)
       {
         titleXPos = currentXPos - canvasConfig.markerColumnWidth;
-        currentXPos = canvasConfig.storyXPosRight; //setup for the marker on the right
+        currentXPos = canvasConfig.storyXPosRight; // setup for the marker on
+                                                   // the right
       }
-      //Boxes on the Right
+      // Boxes on the Right
       else
       {
         arrowDirection = false;
         currentXPos += canvasConfig.markerColumnWidth * (markerCount - 1) + canvasConfig.markerColumnPadding;
         arrowXPos = canvasConfig.storyXPosRight - canvasConfig.storyDepth;
-        titleXPos = currentXPos;        
+        titleXPos = currentXPos;
       }
       draw3DRectangle(legendCanvas.getGraphicsContext2D(), Color.LIGHTSKYBLUE, titleXPos, canvasConfig.offsetY - 15, canvasConfig.markerColumnWidth, 40, 0, true);
       wrapText(legendCanvas.getGraphicsContext2D(), marker.getTitle(), titleXPos + 10, canvasConfig.offsetY, canvasConfig.markerColumnWidth);
-      
-      //Add the Sprint Arrows for this velocity marker
+
+      // Add the Sprint Arrows for this velocity marker
       yPos = canvasConfig.offsetY;
       for (int i = 0; i < sprintsUntilRelease; i++)
       {
         yPos += (marker.getVelocity() * canvasConfig.storyPointPixelFactor);
-        int arrowLength = markerCount == 0 ? 
-          canvasConfig.markerColumnPadding + canvasConfig.markerColumnWidth : 
-          markerCount * (canvasConfig.markerColumnWidth + 2 * canvasConfig.markerColumnPadding); 
+        int arrowLength = markerCount == 0 ? canvasConfig.markerColumnPadding + canvasConfig.markerColumnWidth : markerCount * (canvasConfig.markerColumnWidth + 2 * canvasConfig.markerColumnPadding);
         addSprintArrow(velocityMarkerCanvas.getGraphicsContext2D(), "Sprint " + (i + 1), arrowXPos, yPos, arrowLength, arrowDirection);
       }
       markerCount++;
     }
   }
-  
+
   /**
-   * Splits a string on the "/" delimiter and puts tokens on new lines 15 pixels apart.
+   * Splits a string on the "/" delimiter and puts tokens on new lines 15 pixels
+   * apart.
    * 
    * @param gc
    * @param title
@@ -277,7 +286,7 @@ public class AgileRoadmapUI extends Application
     int lineHeight = 15;
     int currentYPos = yPos;
     gc.setFill(Color.BLACK);
-    for( String line : title.split("/") )
+    for (String line : title.split("/"))
     {
       gc.fillText(line, xPos, currentYPos, width);
       currentYPos += lineHeight;
@@ -310,7 +319,7 @@ public class AgileRoadmapUI extends Application
     // ArrowHead
     gc.strokeLine(xPos, yPos, xPos + arrowHeadLength, yPos + arrowAngle);
     gc.strokeLine(xPos, yPos, xPos + arrowHeadLength, yPos - arrowAngle);
-    //Label
+    // Label
     if (!pointRight)
     {
       gc.setTextAlign(TextAlignment.RIGHT);

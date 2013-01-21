@@ -19,9 +19,19 @@ package org.sprintsmart.roadmap;
 
 import java.util.List;
 
-public class CanvasConfig
+import org.sprintsmart.roadmap.model.Marker;
+import org.sprintsmart.roadmap.model.UserStory;
+
+/**
+ * This class holds the context for rendering the canvas objects.
+ * Any attribute related to sizing or positioning of elements should be maintained here.
+ * 
+ * @author Nate Good
+ *
+ */
+public class CanvasContext
 {
-  final List<VelocityMarker> markers;
+  final List<Marker> markers;
   final List<UserStory> stories;
   final int markerColumnWidth;
   final int storyWidth;
@@ -39,7 +49,7 @@ public class CanvasConfig
   int width;
   int height;
 
-  public CanvasConfig(List<UserStory> stories, List<VelocityMarker> markers, int markerColumnWidth, int storyWidth) 
+  public CanvasContext(List<UserStory> stories, List<Marker> markers, int markerColumnWidth, int storyWidth) 
   {
     this.stories = stories;
     this.markers = markers;
@@ -63,7 +73,7 @@ public class CanvasConfig
     height += 20; //for some space at the bottom
   }
 
-  public List<VelocityMarker> getMarkers()
+  public List<Marker> getMarkers()
   {
     return markers;
   }
