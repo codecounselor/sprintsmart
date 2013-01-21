@@ -19,6 +19,9 @@ package org.sprintsmart.roadmap;
 
 import java.util.List;
 
+import javafx.scene.text.Font;
+
+import org.sprintsmart.roadmap.model.CanvasConfiguration;
 import org.sprintsmart.roadmap.model.Marker;
 import org.sprintsmart.roadmap.model.UserStory;
 
@@ -39,26 +42,33 @@ public class CanvasContext
   int storyXPos;
   int storyXPosRight;
 
-  int storyPointPixelFactor = 10;
+  int storyPointPixelFactor;
   int storyDepth = 20;
   
   int markerHeight = 5;
   int markerColumnPadding = 20;
 
-  int fontHeightOffset = 17;
-  int fontSize = 12;
+  int fontHeightOffset = 15;
+  int summaryFontHeightOffset = 10;
+  
+  private double characterPerPixel = 0.2; 
+  int textCharsPerStoryLine;
+  Font defaultFont = new Font(12);
+  Font summaryFont = new Font(10);
   
   int offsetY = 50;
   int width;
   int height;
 
-  public CanvasContext(List<UserStory> stories, List<Marker> markers, int markerColumnWidth, int storyWidth) 
+  public CanvasContext(List<UserStory> stories, List<Marker> markers, CanvasConfiguration config) 
   {
     this.stories = stories;
     this.markers = markers;
-    this.markerColumnWidth = markerColumnWidth;
-    this.storyWidth = storyWidth;
+    this.markerColumnWidth = config.getMarkerWidth();
+    this.storyWidth = config.getStoryWidth();
+    this.storyPointPixelFactor = config.getStorySizePixelFactor();
 
+    textCharsPerStoryLine = (int) (characterPerPixel * this.storyWidth);
     storyXPos = markers.size() > 0 ? markerColumnWidth + (2 * markerColumnPadding) : 0;
     storyXPosRight = storyXPos + storyWidth + storyDepth;
 
