@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SprintRoadmap>
+
+  <ProductBacklog 
+    rssFeed="https://jira.atlassian.com/sr/jira.issueviews:searchrequest-xml/36543/SearchRequest-36543.xml?tempMax=200&amp;field=key&amp;field=labels&amp;field=story%20points&amp;os_username=nsgood82&amp;os_password=nsg123"
+  >
+    <CanvasConfiguration storyWidth="300" markerWidth="150" />
+    
+    <LabelThemes>
+      <Label value="blue" color="BLUE" />
+      <Label value="qa-manual" color="ORANGE" />
+      <Label value="bughunt_js" color="FIREBRICK" />
+    </LabelThemes>
+    
+    <VelocityMarkers>
+      <Marker velocity="14" color="GREEN" title="Release Deliverables/ @ Velocity=14" label="Release Commit Level" />
+      <Marker velocity="16" color="YELLOW" title="Release Deliverables/ @ Velocity=16" label="Current Delivery Level" />
+      <Marker velocity="20" color="RED" title="Release Deliverables/ @ Velocity=20" label="Potential Delivery Level" />
+    </VelocityMarkers>
+    
+  </ProductBacklog>
+
+</SprintRoadmap>

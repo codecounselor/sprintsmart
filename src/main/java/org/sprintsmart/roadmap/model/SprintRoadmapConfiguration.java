@@ -13,49 +13,39 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
-package org.sprintsmart.roadmap;
+ */
+package org.sprintsmart.roadmap.model;
 
-import javafx.scene.paint.Color;
+import java.io.File;
+
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
 
 /**
- * This class represents a set of markers to denote a certain team velocity.
- * 
  * @author Nate Good
+ * 
  */
-public class VelocityMarker
+public class SprintRoadmapConfiguration
 {
-  private String title;
-  private String text;
-  private int velocity;
-  private Color color;
-
-  public VelocityMarker(String title, String text, int velocity, Color color) 
+  SprintRoadmap roadmap;
+  
+  /**
+   * Loads a configuration file from the filesystem
+   */
+  public SprintRoadmapConfiguration(String pConfigFileLocation) throws Exception
   {
-    this.title = title;
-    this.text = text;
-    this.velocity = velocity;
-    this.color = color;
-  }
-
-  public String getTitle()
-  {
-    return title;
+    File file = new File(pConfigFileLocation);
+    JAXBContext jaxbContext = JAXBContext.newInstance(SprintRoadmap.class);
+ 
+    Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+    roadmap = (SprintRoadmap) jaxbUnmarshaller.unmarshal(file);
   }
   
-  public String getText()
+  /**
+   * @return the roadmap
+   */
+  public SprintRoadmap getRoadmap()
   {
-    return text;
+    return roadmap;
   }
-
-  public int getVelocity()
-  {
-    return velocity;
-  }
-
-  public Color getColor()
-  {
-    return color;
-  }
-
 }
