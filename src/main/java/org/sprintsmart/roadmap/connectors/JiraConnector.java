@@ -28,6 +28,8 @@ import javafx.scene.paint.Color;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathFactory;
 
 import org.sprintsmart.roadmap.model.Label;
 import org.sprintsmart.roadmap.model.ProductBacklog;
@@ -45,11 +47,19 @@ public class JiraConnector
   {
     for( Label label : productBacklogConfig.getLabelThemes().getLabel() )
     {
-      label2Color.put(label.getValue(), Color.valueOf(label.getColor()));      
+      if( label.getColor() != null )
+      {
+        label2Color.put(label.getValue(), Color.valueOf(label.getColor()));        
+      }
+      else if( label.getWebColor() != null )
+      {
+        label2Color.put(label.getValue(), Color.web(label.getWebColor()));        
+      }
     }
     
     try
     {
+      XPath xpath = XPathFactory.newInstance().newXPath();
       URL url = new URL(productBacklogConfig.getRssFeed());
 
       InputStream is = url.openStream();
@@ -59,15 +69,20 @@ public class JiraConnector
       NodeList itemNodes = xmlDoc.getElementsByTagName("item");
       for( int i=0; i < itemNodes.getLength(); i++ )
       {
-        Element item = (Element) itemNodes.item(i);
+        Element jiraItem = (Element) itemNodes.item(i);
         Color storyColor = Color.GRAY;
-        String storyName = item.getElementsByTagName("key").item(0).getTextContent();
-        NodeList labels = item.getElementsByTagName("label");
+        String storyName = jiraItem.getElementsByTagName("key").item(0).getTextContent();
+        String summary = jiraItem.getElementsByTagName("summary").item(0).getTextContent();
+        String storySize = xpath.evaluate(productBacklogConfig.getStorySizeXPath(), jiraItem);
+        
+        NodeList labels = jiraItem.getElementsByTagName("label");
+        List<String> labelList = new ArrayList();
         if( labels != null )
         {
           for( int l=0; l < labels.getLength(); l++ )
           {
             String label = labels.item(l).getTextContent();
+            labelList.add(label);
             if( label2Color.containsKey(label) )
             {
               storyColor = label2Color.get(label);
@@ -75,7 +90,7 @@ public class JiraConnector
           }
         }
 
-        stories.add(new UserStory(5, storyColor, storyName));
+        stories.add(new UserStory(Double.valueOf(storySize).intValue(), storyColor, storyName, summary, labelList));
       }
     } 
     catch (Exception e)

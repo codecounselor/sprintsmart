@@ -17,6 +17,7 @@
 package org.sprintsmart.roadmap;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import javafx.application.Application;
@@ -33,7 +34,6 @@ import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
 import javafx.scene.shape.StrokeLineJoin;
-import javafx.scene.text.Font;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 
@@ -42,6 +42,7 @@ import javax.imageio.ImageIO;
 import org.sprintsmart.roadmap.connectors.JiraConnector;
 import org.sprintsmart.roadmap.model.Marker;
 import org.sprintsmart.roadmap.model.ProductBacklog;
+import org.sprintsmart.roadmap.model.Sprint;
 import org.sprintsmart.roadmap.model.SprintRoadmap;
 import org.sprintsmart.roadmap.model.SprintRoadmapConfiguration;
 import org.sprintsmart.roadmap.model.UserStory;
@@ -64,6 +65,7 @@ public class AgileRoadmapUI extends Application
   
   static CanvasContext canvasConfig;
 
+  ProductBacklog productBacklog;
   int currentStoryYPos;
 
   /**
@@ -92,10 +94,9 @@ public class AgileRoadmapUI extends Application
     SprintRoadmap roadmap = config.getRoadmap();
     
     //TODO: support multiple
-    ProductBacklog productBacklog = roadmap.getProductBacklog().get(0);
-
+    productBacklog = roadmap.getProductBacklog().get(0);
     List<UserStory> stories = new JiraConnector(productBacklog).getStories();
-    canvasConfig = new CanvasContext(stories, productBacklog.getVelocityMarkers().getMarker(), 150, 300);
+    canvasConfig = new CanvasContext(stories, productBacklog.getVelocityMarkers().getMarker(), productBacklog.getCanvasConfiguration());
   }
 
   public void start(Stage primaryStage)
@@ -104,7 +105,7 @@ public class AgileRoadmapUI extends Application
     {
       initialize();
 
-      primaryStage.setTitle("Drawing Operations Test");
+      primaryStage.setTitle("SprintSmart - Agile Release Planning Tool");
 
       int requiredWidth = canvasConfig.getWidth();
       int requiredHeight = canvasConfig.getHeight();
@@ -117,10 +118,10 @@ public class AgileRoadmapUI extends Application
       
       //Set the Text Style
       textGraphicsContext = storyLabelCanvas.getGraphicsContext2D();
-      textGraphicsContext.setFont(new Font(canvasConfig.fontSize));
+      textGraphicsContext.setFont(canvasConfig.defaultFont);
       textGraphicsContext.setFill(Color.BLACK);
 
-      drawMarkers(sprintMarkerCanvas.getGraphicsContext2D(), canvasConfig.getMarkers(), 4);
+      drawMarkers(sprintMarkerCanvas.getGraphicsContext2D(), canvasConfig.getMarkers(), productBacklog.getSprints().getSprint());
       drawStories(storyCanvas.getGraphicsContext2D(), canvasConfig.getStories());
 
       Group root = new Group();
@@ -139,18 +140,19 @@ public class AgileRoadmapUI extends Application
       scrollPane.setContent(root);
 
       // This doesn't render to a file correctly
-      Scene theScene = new Scene(scrollPane);
+      //Scene theScene = new Scene(scrollPane);
 
       // Have to set the root if we want to create a file, to view interactively
       // we must use a scroll pane though
-      // Scene theScene = new Scene(root);
+      Scene theScene = new Scene(root);
 
       primaryStage.setScene(theScene);
       primaryStage.show();
 
       WritableImage image = new WritableImage(requiredWidth, requiredHeight);
       theScene.snapshot(image);
-      File file = new File("/Users/nate/Pictures/AgileMap.png");
+      //TODO: Put the image in the working directory for now, allow an option for somewhere else.
+      File file = new File("AgileMap.png");
       ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
     } 
     catch (Exception e)
@@ -178,7 +180,7 @@ public class AgileRoadmapUI extends Application
 
       // Create the story
       double xPosRight = canvasConfig.storyXPos + canvasConfig.storyWidth;
-      double height = size * canvasConfig.storyPointPixelFactor;
+      int height = size * canvasConfig.storyPointPixelFactor;
 
       // Make sure the canvas is big enough to render the next story
       if (storyCanvas.getHeight() < currentStoryYPos + height)
@@ -195,8 +197,15 @@ public class AgileRoadmapUI extends Application
         addPolyLid(gc, color, canvasConfig.storyXPos, xPosRight, canvasConfig.storyDepth, currentStoryYPos);
       }
 
-      // Add Story Text
-      textGraphicsContext.fillText(story.getText(), canvasConfig.storyXPos + 10, currentStoryYPos + 15);
+      // Add Story Header Text
+      String keyAndPoints = story.getText() + " (" + story.getSize() + ")";
+      String labels = story.getLabels().toString();
+      int textYPos = currentStoryYPos + canvasConfig.fontHeightOffset;
+      textGraphicsContext.fillText(keyAndPoints + "  " + labels, canvasConfig.storyXPos + 10, textYPos);
+      
+      //Add Story Summary
+      textYPos += canvasConfig.fontHeightOffset;
+      writeStorySummary(story.getSummary(), canvasConfig.storyXPos + 5, textYPos, canvasConfig.textCharsPerStoryLine, height);
       
       currentStoryYPos += height;
       storyCount++;
@@ -235,8 +244,9 @@ public class AgileRoadmapUI extends Application
     gc.strokePolygon(new double[] { xPosLeft, xPosRight, xPosDepth, xPosLeft + depth }, new double[] { yPos, yPos, yPos - depth, yPos - depth }, 4);
   }
 
-  private void drawMarkers(GraphicsContext gc, List<Marker> markers, int sprintsUntilRelease)
+  private void drawMarkers(GraphicsContext gc, List<Marker> markers, List<Sprint> sprints)
   {
+    int sprintsUntilRelease = sprints.size();
     int width = canvasConfig.storyWidth;
     int markerCount = 0;
     int currentXPos = canvasConfig.storyXPos - canvasConfig.markerColumnPadding;
@@ -274,12 +284,13 @@ public class AgileRoadmapUI extends Application
 
       // Add the Sprint Arrows for this velocity marker
       yPos = canvasConfig.offsetY;
-      for (int i = 0; i < sprintsUntilRelease; i++)
+      for (Sprint sprint : sprints)
       {
         yPos += (marker.getVelocity() * canvasConfig.storyPointPixelFactor);
         int arrowLength = markerCount == 0 ? canvasConfig.markerColumnPadding + canvasConfig.markerColumnWidth : //Left Marker Column
                              (markerCount * (canvasConfig.markerColumnPadding + canvasConfig.markerColumnWidth)) + canvasConfig.markerColumnPadding; //Right Marker Columns
-        addSprintArrow(velocityMarkerCanvas.getGraphicsContext2D(), "Sprint " + (i + 1), arrowXPos, yPos, arrowLength, arrowDirection);
+        String sprintArrowLabel = sprint.getLabel() + " (" + new SimpleDateFormat("M/d").format(sprint.getEndDate().getTime()) + ")";
+        addSprintArrow(velocityMarkerCanvas.getGraphicsContext2D(), sprintArrowLabel, arrowXPos, yPos, arrowLength, arrowDirection);
       }
       markerCount++;
     }
@@ -303,6 +314,35 @@ public class AgileRoadmapUI extends Application
       textGraphicsContext.fillText(line, xPos, currentYPos, width);
       currentYPos += canvasConfig.fontHeightOffset;
     }
+  }
+  
+  private void writeStorySummary(String text, int xPos, int yPos, int maxChars, int maxHeight)
+  { 
+    textGraphicsContext.setFont(canvasConfig.summaryFont);
+    
+    int currentYPos = yPos;
+    int textHeight = canvasConfig.fontHeightOffset + canvasConfig.summaryFontHeightOffset; //Story Title + 1st Row of summary
+    StringBuilder currentLine = new StringBuilder();
+    for (String word : text.split(" "))
+    {
+      if( currentLine.length() + word.length() > maxChars )
+      {
+        textGraphicsContext.fillText(currentLine.toString(), xPos, currentYPos);
+        currentYPos += canvasConfig.summaryFontHeightOffset;  
+        currentLine.setLength(0);
+        textHeight += canvasConfig.summaryFontHeightOffset;
+      }
+      //Stop if we are going to overrun the next story
+      if( textHeight > maxHeight )
+        break;
+      
+      currentLine.append(word).append(" ");
+    }
+    if( currentLine.length() > 0 )
+    {
+      textGraphicsContext.fillText(currentLine.toString(), xPos, currentYPos);      
+    }
+    textGraphicsContext.setFont(canvasConfig.defaultFont);
   }
 
   /**

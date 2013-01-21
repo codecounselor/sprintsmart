@@ -16,6 +16,8 @@
  */
 package org.sprintsmart.roadmap.model;
 
+import java.util.List;
+
 import javafx.scene.paint.Color;
 
 /**
@@ -27,19 +29,39 @@ public class UserStory
   private int size;
   private Color color;
   private String text;
+  private String summary;
+  private List<String> labels;
 
-  public UserStory(int size, Color color, String text) 
+  public UserStory(int size, Color color, String text, String summary, List<String> labels) 
   {
     this.size = size;
     this.color = color;
     this.text = text;
+    this.summary = summary;
+    this.labels = labels;
   }
 
   public String getText()
   {
     return text;
   }
+  
+  /**
+   * @return the summary
+   */
+  public String getSummary()
+  {
+    return summary;
+  }
 
+  /**
+   * @return the labels
+   */
+  public List<String> getLabels()
+  {
+    return labels;
+  }
+  
   public int getSize()
   {
     return size;
