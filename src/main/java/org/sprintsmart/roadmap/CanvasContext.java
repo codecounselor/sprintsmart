@@ -45,6 +45,9 @@ public class CanvasContext
   int markerHeight = 5;
   int markerColumnPadding = 20;
 
+  int fontHeightOffset = 17;
+  int fontSize = 12;
+  
   int offsetY = 50;
   int width;
   int height;
