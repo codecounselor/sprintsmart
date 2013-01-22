@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+  <xs:element name="SprintRoadmap">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="ProductBacklog" maxOccurs="unbounded" />
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="ProductBacklog">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element ref="CanvasConfiguration"/>
+        <xs:element ref="Sprints">
+          <xs:annotation><xs:documentation>Define all of the sprints that should be included in your release roadmap.  Your backlog should include the stories for all of these sprints, even if they were completed in a sprint that has ended.</xs:documentation></xs:annotation>
+        </xs:element>
+        <xs:element ref="LabelThemes">
+          <xs:annotation><xs:documentation>Define a mapping between your story labels and a visual theme</xs:documentation></xs:annotation>
+        </xs:element>
+        <xs:element ref="VelocityMarkers"/>
+      </xs:sequence>
+      <xs:attribute name="rssFeed" use="required" type="xs:string"/>
+      <xs:attribute name="storySizeXPath" use="required" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="CanvasConfiguration">
+    <xs:complexType>
+      <xs:attribute name="markerWidth" use="required" type="xs:int"/>
+      <xs:attribute name="storyWidth" use="required" type="xs:int"/>
+      <xs:attribute name="storySizePixelFactor" use="required" type="xs:int"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Sprints">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="Sprint"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Sprint">
+    <xs:complexType>
+      <xs:attribute name="label" use="required" type="xs:string"/>
+      <xs:attribute name="startDate" use="required" type="xs:date"/>
+      <xs:attribute name="endDate" use="required" type="xs:date"/>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="LabelThemes">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element maxOccurs="unbounded" ref="Label"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Label">
+    <xs:complexType>
+      <xs:attribute name="value" use="required" type="xs:string"/>
+      <xs:attribute name="color" use="optional" type="xs:string">
+        <xs:annotation><xs:documentation>Any color supported by http://docs.oracle.com/javafx/2/api/javafx/scene/paint/Color.html#valueOf(java.lang.String)</xs:documentation></xs:annotation>
+      </xs:attribute>
+      <xs:attribute name="webColor" use="optional" type="xs:string">
+        <xs:annotation><xs:documentation>Any color supported by http://docs.oracle.com/javafx/2/api/javafx/scene/paint/Color.html#web(java.lang.String)</xs:documentation></xs:annotation>
+      </xs:attribute>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="VelocityMarkers">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element minOccurs="0" maxOccurs="unbounded" ref="Marker"/>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="Marker">
+    <xs:complexType>
+      <xs:attribute name="title" use="required"/>
+      <xs:attribute name="label" use="required"/>
+      <xs:attribute name="velocity" use="required" type="xs:int"/>
+      <xs:attribute name="color" use="required" type="xs:string"/>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

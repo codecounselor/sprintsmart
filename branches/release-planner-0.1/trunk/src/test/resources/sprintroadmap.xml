@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<SprintRoadmap>
+
+  <ProductBacklog 
+    rssFeed="https://jira.atlassian.com/sr/jira.issueviews:searchrequest-xml/temp/SearchRequest.xml?jqlQuery=project+%3D+GHS+AND+summary+~+%22As+a+user%22+AND+issuetype+%3D+Story+AND+cf[10653]+%3C+%2220%22+AND+cf[10653]+%3E+%222%22+AND+created+%3E%3D+-20w&amp;tempMax=200&amp;field=key&amp;field=labels&amp;field=summary&amp;field=customfield_10653"
+    storySizeXPath="customfields/customfield[@id='customfield_10653']//customfieldvalue"
+  >
+  <!-- 
+    Public Search URL: https://jira.atlassian.com/issues/?jql=project%20%3D%20GHS%20AND%20summary%20~%20%22As%20a%20user%22%20AND%20issuetype%20%3D%20Story%20AND%20cf[10653]%20%3C%20%2220%22%20AND%20cf[10653]%20%3E%20%222%22%20AND%20created%20%3E%3D%20-20w
+    RSS Feed: https://jira.atlassian.com/sr/jira.issueviews:searchrequest-xml/temp/SearchRequest.xml?jqlQuery=project+%3D+GHS+AND+summary+~+%22As+a+user%22+AND+issuetype+%3D+Story+AND+cf[10653]+%3C+%2220%22+AND+cf[10653]+%3E+%222%22+AND+created+%3E%3D+-20w&amp;tempMax=200&amp;field=key&amp;field=labels&amp;field=summary&amp;field=customfield_10653    
+   -->
+    <CanvasConfiguration storyWidth="300" markerWidth="150" storySizePixelFactor="15" />
+    
+    <Sprints>
+      <Sprint startDate="2013-01-09" endDate="2013-01-29" label="Sprint 13.01" />
+      <Sprint startDate="2013-01-30" endDate="2013-02-19" label="Sprint 13.02" />
+      <Sprint startDate="2013-02-20" endDate="2013-03-12" label="Sprint 13.03" />
+      <Sprint startDate="2013-03-13" endDate="2013-04-02" label="Sprint 13.04" />
+    </Sprints>
+    
+    <LabelThemes>
+      <Label value="Triaged"  color="BLUE" />
+      <Label value="blitz"  color="ORANGE" />
+      <Label value="must"   color="FIREBRICK" />
+    </LabelThemes>
+    
+    <VelocityMarkers>
+      <Marker velocity="8" color="LIGHTGREEN" title="Release Deliverables/ @ Velocity=8" label="Release Commit Level" />
+      <Marker velocity="12" color="YELLOW" title="Release Deliverables/ @ Velocity=12" label="Current Delivery Level" />
+      <!-- 
+      <Marker velocity="14" color="RED" title="Release Deliverables/ @ Velocity=14" label="Potential Delivery Level" />
+       -->
+    </VelocityMarkers>
+    
+  </ProductBacklog>
+
+</SprintRoadmap>
