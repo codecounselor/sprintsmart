@@ -2,10 +2,12 @@
 
 = Introduction =
 
-Coming Soon
+This project was designed for Scrum Masters who must make project commitments that align with an enterprise release plan many iterations into the backlog.
 
-= Feature Backlog =
+The application will generate a visual representation of what your development team(s) can commit to over a series of time boxed sprints.
 
-  # XML Config file to specify JIRA URL, label-color mappings, velocity marker settings, sprint details, number of sprints
+= Feature Backlog for version 0.2 =
+
   # Display status icons for story pending, in progress, complete
-  # Add dates to sprint markers
+  # Support for user-defined fonts in configuration file
+  # 
