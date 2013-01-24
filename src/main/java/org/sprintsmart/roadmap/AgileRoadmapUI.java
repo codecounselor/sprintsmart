@@ -18,6 +18,7 @@ package org.sprintsmart.roadmap;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 import javafx.application.Application;
@@ -63,9 +64,9 @@ public class AgileRoadmapUI extends Application
   
   GraphicsContext textGraphicsContext;
   
-  static CanvasContext canvasConfig;
+  CanvasContext canvasConfig;
 
-  ProductBacklog productBacklog;
+  SprintRoadmapConfiguration config;
   int currentStoryYPos;
 
   /**
@@ -90,13 +91,7 @@ public class AgileRoadmapUI extends Application
   {
     List<String> params = getParameters().getRaw();
     String configFile = params.get(0); //"configFile"
-    SprintRoadmapConfiguration config = new SprintRoadmapConfiguration(configFile);
-    SprintRoadmap roadmap = config.getRoadmap();
-    
-    //TODO: support multiple
-    productBacklog = roadmap.getProductBacklog().get(0);
-    List<UserStory> stories = new JiraConnector(productBacklog).getStories();
-    canvasConfig = new CanvasContext(stories, productBacklog.getVelocityMarkers().getMarker(), productBacklog.getCanvasConfiguration());
+    config = new SprintRoadmapConfiguration(configFile);
   }
 
   public void start(Stage primaryStage)
@@ -106,54 +101,69 @@ public class AgileRoadmapUI extends Application
       initialize();
 
       primaryStage.setTitle("SprintSmart - Agile Release Planning Tool");
-
-      int requiredWidth = canvasConfig.getWidth();
-      int requiredHeight = canvasConfig.getHeight();
-
-      storyCanvas = new Canvas(requiredWidth, requiredHeight);
-      storyLabelCanvas = new Canvas(requiredWidth, requiredHeight);
-      sprintMarkerCanvas = new Canvas(requiredWidth, requiredHeight);
-      velocityMarkerCanvas = new Canvas(requiredWidth, requiredHeight);
-      legendCanvas = new Canvas(requiredWidth, requiredHeight);
-      
-      //Set the Text Style
-      textGraphicsContext = storyLabelCanvas.getGraphicsContext2D();
-      textGraphicsContext.setFont(canvasConfig.defaultFont);
-      textGraphicsContext.setFill(Color.BLACK);
-
-      drawMarkers(sprintMarkerCanvas.getGraphicsContext2D(), canvasConfig.getMarkers(), productBacklog.getSprints().getSprint());
-      drawStories(storyCanvas.getGraphicsContext2D(), canvasConfig.getStories());
-
       Group root = new Group();
-      root.getChildren().add(storyCanvas);
-      root.getChildren().add(sprintMarkerCanvas);
-      root.getChildren().add(velocityMarkerCanvas);
-      root.getChildren().add(storyLabelCanvas);
-      root.getChildren().add(legendCanvas);
 
-      sprintMarkerCanvas.toFront();
-      velocityMarkerCanvas.toFront();      
-      storyLabelCanvas.toFront();
+      SprintRoadmap roadmap = config.getRoadmap();
+      int startingXPos = 0;
+      int maxHeight = 0;
+      for( ProductBacklog productBacklog : roadmap.getProductBacklog() )
+      {            
+        List<UserStory> stories = new JiraConnector(productBacklog).getStories();
+        canvasConfig = new CanvasContext(stories, productBacklog.getVelocityMarkers().getMarker(), productBacklog.getCanvasConfiguration(), startingXPos);
+        int requiredWidth = canvasConfig.getWidth();
+        int requiredHeight = canvasConfig.getHeight();
+        
+        storyCanvas = new Canvas(requiredWidth, requiredHeight);
+        storyLabelCanvas = new Canvas(requiredWidth, requiredHeight);
+        sprintMarkerCanvas = new Canvas(requiredWidth, requiredHeight);
+        velocityMarkerCanvas = new Canvas(requiredWidth, requiredHeight);
+        legendCanvas = new Canvas(requiredWidth, requiredHeight);
+        
+        //Set the Text Style
+        textGraphicsContext = storyLabelCanvas.getGraphicsContext2D();
+        textGraphicsContext.setFont(canvasConfig.defaultFont);
+        textGraphicsContext.setFill(Color.BLACK);
+        
+        drawMarkers(sprintMarkerCanvas.getGraphicsContext2D(), canvasConfig.getMarkers(), productBacklog.getSprints().getSprint());
+        drawStories(storyCanvas.getGraphicsContext2D(), canvasConfig.getStories());
+        
+        List<Canvas> canvasList = new ArrayList<Canvas>();
+        canvasList.add(storyCanvas);
+        canvasList.add(sprintMarkerCanvas);
+        canvasList.add(velocityMarkerCanvas);
+        canvasList.add(storyLabelCanvas);
+        canvasList.add(legendCanvas);
+        root.getChildren().addAll(canvasList);
+        
+        sprintMarkerCanvas.toFront();
+        velocityMarkerCanvas.toFront();      
+        storyLabelCanvas.toFront();
+        
+        for( Canvas c : canvasList )
+        {
+          c.setTranslateX(startingXPos);
+        }
+        
+        startingXPos += canvasConfig.width;
+        maxHeight = Math.max(requiredHeight, maxHeight);
+      }
 
       ScrollPane scrollPane = new ScrollPane();
-      scrollPane.setPrefSize(requiredWidth, requiredHeight);
+      scrollPane.setPrefSize(1200, 800);
       scrollPane.setContent(root);
 
       // This doesn't render to a file correctly
       //Scene theScene = new Scene(scrollPane);
 
-      // Have to set the root if we want to create a file, to view interactively
-      // we must use a scroll pane though
       Scene theScene = new Scene(root);
 
       primaryStage.setScene(theScene);
       primaryStage.show();
 
-      WritableImage image = new WritableImage(requiredWidth, requiredHeight);
+      WritableImage image = new WritableImage(startingXPos, maxHeight);
       theScene.snapshot(image);
-      //TODO: Put the image in the working directory for now, allow an option for somewhere else.
-      File file = new File("AgileMap.png");
-      ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
+      File file = new File(roadmap.getImageFileName());
+      ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);      
     } 
     catch (Exception e)
     {
@@ -161,7 +171,7 @@ public class AgileRoadmapUI extends Application
     } 
     finally
     {
-
+      //System.exit(0);
     }
   }
 
@@ -181,13 +191,6 @@ public class AgileRoadmapUI extends Application
       // Create the story
       double xPosRight = canvasConfig.storyXPos + canvasConfig.storyWidth;
       int height = size * canvasConfig.storyPointPixelFactor;
-
-      // Make sure the canvas is big enough to render the next story
-      if (storyCanvas.getHeight() < currentStoryYPos + height)
-      {
-        System.out.println(storyCanvas.isResizable());
-        storyCanvas.resize(storyCanvas.getWidth(), currentStoryYPos + height);
-      }
 
       draw3DRectangle(gc, color, canvasConfig.storyXPos, currentStoryYPos, canvasConfig.storyWidth, height, canvasConfig.storyDepth, true);
 
@@ -333,7 +336,7 @@ public class AgileRoadmapUI extends Application
         textHeight += canvasConfig.summaryFontHeightOffset;
       }
       //Stop if we are going to overrun the next story
-      if( textHeight > maxHeight )
+      if( textHeight >= maxHeight )
         break;
       
       currentLine.append(word).append(" ");

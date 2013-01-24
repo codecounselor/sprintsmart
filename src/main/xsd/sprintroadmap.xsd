@@ -5,6 +5,7 @@
       <xs:sequence>
         <xs:element ref="ProductBacklog" maxOccurs="unbounded" />
       </xs:sequence>
+      <xs:attribute name="imageFileName" use="required" type="xs:string"/>      
     </xs:complexType>
   </xs:element>
   <xs:element name="ProductBacklog">
