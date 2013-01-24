@@ -76,7 +76,7 @@ public class JiraConnector
         String storySize = xpath.evaluate(productBacklogConfig.getStorySizeXPath(), jiraItem);
         
         NodeList labels = jiraItem.getElementsByTagName("label");
-        List<String> labelList = new ArrayList();
+        List<String> labelList = new ArrayList<String>();
         if( labels != null )
         {
           for( int l=0; l < labels.getLength(); l++ )
@@ -90,7 +90,11 @@ public class JiraConnector
           }
         }
 
-        stories.add(new UserStory(Double.valueOf(storySize).intValue(), storyColor, storyName, summary, labelList));
+        //Don't add a story if it hasn't been estimated
+        if( storySize != null && storySize.trim().length() > 0 )
+        {
+          stories.add(new UserStory(Double.valueOf(storySize).intValue(), storyColor, storyName, summary, labelList));          
+        }
       }
     } 
     catch (Exception e)

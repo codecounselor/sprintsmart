@@ -46,21 +46,21 @@ public class CanvasContext
   int storyDepth = 20;
   
   int markerHeight = 5;
-  int markerColumnPadding = 20;
+  int markerColumnPadding = 10;
 
   int fontHeightOffset = 15;
-  int summaryFontHeightOffset = 10;
+  int summaryFontHeightOffset = 12;
   
-  private double characterPerPixel = 0.2; 
   int textCharsPerStoryLine;
-  Font defaultFont = new Font(12);
-  Font summaryFont = new Font(10);
+  final Font defaultFont = new Font("Arial", 14);
+  final Font summaryFont = new Font("Arial", 12); 
+  final private double characterPerPixel = 0.17; 
   
   int offsetY = 50;
   int width;
   int height;
 
-  public CanvasContext(List<UserStory> stories, List<Marker> markers, CanvasConfiguration config) 
+  public CanvasContext(List<UserStory> stories, List<Marker> markers, CanvasConfiguration config, int startingXPos) 
   {
     this.stories = stories;
     this.markers = markers;
@@ -69,7 +69,7 @@ public class CanvasContext
     this.storyPointPixelFactor = config.getStorySizePixelFactor();
 
     textCharsPerStoryLine = (int) (characterPerPixel * this.storyWidth);
-    storyXPos = markers.size() > 0 ? markerColumnWidth + (2 * markerColumnPadding) : 0;
+    storyXPos = startingXPos + markers.size() > 0 ? markerColumnWidth + (2 * markerColumnPadding) : 0;
     storyXPosRight = storyXPos + storyWidth + storyDepth;
 
     width = storyXPos + storyWidth + storyDepth;
