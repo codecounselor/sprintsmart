@@ -6,10 +6,18 @@ This project was designed for Scrum Masters who must make project commitments th
 
 The application will generate a visual representation of what your development team(s) can commit to over a series of time boxed sprints.
 
-= Feature Backlog for version 0.2 =
+= Project Roadmap = 
 
-  # Display status icons for story pending, in progress, complete
-  # Support for user-defined fonts in configuration file
+== Feature Backlog for version 0.2 ==
+
+  # DONE - Display status icons for story pending, in progress, complete
   # DONE - Render Multiple Product Backlogs on one canvas (image)
-  # Support for command line switch to launch in interactive mode
+  # Support for user-defined fonts in configuration file
+  # Support for user-defined status mappings
   # Add Legend
+
+== Feature Backlog for version 0.3 == 
+  # Support for command line switch to launch in interactive mode
+
+== Feature Backlog for version 1.0 ==
+  # Native iOS and OSX Application
