@@ -1,8 +1,17 @@
 #summary XML Configuration Guide
 
 = Introduction =
-The Roadmap Tool requires an XML configuration file to be executed.  
-The image below was generated from the following configuration.
+This page is intended to get you setup with the application and be able to write a configuration file that is customized for your own Agile Team(s).  You may find it most useful if you have to generate roadmaps across several teams.  It will help you visualize cross dependencies and help increase confidence when making longer term commitments.
+
+== Installation Instructions ==
+This application uses JavaFX.  Therefore, Java7 is required for you to execute the application, make sure you have the latest JDK from oracle installed on your system.
+
+  # Download the latest executable jar from the [http://code.google.com/p/sprintsmart/downloads/list Downloads Page}
+  # Either copy the sample XML below into your own xml configuration file or define your own based on your roadmap requirements.
+  # Execute the following command
+{{{ java -jar release-planner.jar RoadMapConfig.xml }}}
+
+This will launch the GUI frame that contains the diagram.  Do not worry if it doesn't fit on the screen completely.  A image file will be automatically generated in the user directory.  You may exit the window at any time at this point.
 
 == Configuration Instructions ==
   * *Connectors* - The current implementation supports a JIRA connector which is no more than an RSS feed.  You are expected to write a JIRA Query that returns atleast a minimum the following fields:
