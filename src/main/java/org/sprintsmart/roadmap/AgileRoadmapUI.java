@@ -125,7 +125,7 @@ public class AgileRoadmapUI extends Application
         textGraphicsContext.setFill(Color.BLACK);
         
         drawMarkers(sprintMarkerCanvas.getGraphicsContext2D(), canvasConfig.getMarkers(), productBacklog.getSprints().getSprint());
-        drawStories(storyCanvas.getGraphicsContext2D(), canvasConfig.getStories());
+        drawStories(storyCanvas.getGraphicsContext2D(), canvasConfig.getStories(), productBacklog.getName());
         
         List<Canvas> canvasList = new ArrayList<Canvas>();
         canvasList.add(storyCanvas);
@@ -175,13 +175,18 @@ public class AgileRoadmapUI extends Application
     }
   }
 
-  private void drawStories(GraphicsContext gc, List<UserStory> userStories)
+  private void drawStories(GraphicsContext gc, List<UserStory> userStories, String header)
   {
     gc.setStroke(Color.GREY);
     gc.setLineWidth(1);
     gc.setLineJoin(StrokeLineJoin.MITER);
 
     currentStoryYPos = canvasConfig.offsetY;
+    
+    textGraphicsContext.setTextAlign(TextAlignment.CENTER);
+    textGraphicsContext.fillText(header, canvasConfig.storyXPos + (canvasConfig.storyWidth / 2), 20, canvasConfig.storyWidth);
+    textGraphicsContext.setTextAlign(TextAlignment.LEFT);
+  
     int storyCount = 1;
     for (UserStory story : userStories)
     {
@@ -200,15 +205,22 @@ public class AgileRoadmapUI extends Application
         addPolyLid(gc, color, canvasConfig.storyXPos, xPosRight, canvasConfig.storyDepth, currentStoryYPos);
       }
 
+      //Add Status Icon
+      int imgHeight = 40;
+      int imgWidth = 15;
+      //int imgWidth = (437/389) * imgHeight;
+      gc.drawImage(story.getStatusImage(), canvasConfig.storyXPos + 3, currentStoryYPos + 3, imgWidth, imgHeight); 
+
       // Add Story Header Text
       String keyAndPoints = story.getText() + " (" + story.getSize() + ")";
       String labels = story.getLabels().toString();
       int textYPos = currentStoryYPos + canvasConfig.fontHeightOffset;
-      textGraphicsContext.fillText(keyAndPoints + "  " + labels, canvasConfig.storyXPos + 10, textYPos);
+      textGraphicsContext.fillText(keyAndPoints + "  " + labels, canvasConfig.storyXPos + imgWidth + 10, textYPos);
       
       //Add Story Summary
       textYPos += canvasConfig.fontHeightOffset;
-      writeStorySummary(story.getSummary(), canvasConfig.storyXPos + 5, textYPos, canvasConfig.textCharsPerStoryLine, height);
+      writeStorySummary(story.getSummary(), canvasConfig.storyXPos + imgWidth + 10, textYPos, canvasConfig.textCharsPerStoryLine, height);
+      
       
       currentStoryYPos += height;
       storyCount++;
@@ -282,8 +294,8 @@ public class AgileRoadmapUI extends Application
         arrowXPos = canvasConfig.storyXPosRight - canvasConfig.storyDepth;
         titleXPos = currentXPos;
       }
-      draw3DRectangle(legendCanvas.getGraphicsContext2D(), Color.LIGHTSKYBLUE, titleXPos, canvasConfig.offsetY - 15, canvasConfig.markerColumnWidth, 40, 0, true);
-      wrapText(marker.getTitle(), titleXPos + 10, canvasConfig.offsetY, canvasConfig.markerColumnWidth);
+      draw3DRectangle(legendCanvas.getGraphicsContext2D(), Color.LIGHTSKYBLUE, titleXPos, 10, canvasConfig.markerColumnWidth, 40, 0, true);
+      wrapText(marker.getTitle(), titleXPos + 10, 10 + canvasConfig.fontHeightOffset, canvasConfig.markerColumnWidth);
 
       // Add the Sprint Arrows for this velocity marker
       yPos = canvasConfig.offsetY;

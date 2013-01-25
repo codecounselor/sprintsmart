@@ -3,7 +3,7 @@
 
   <ProductBacklog
     name="Sample Backlog 1"
-    rssFeed="https://jira.atlassian.com/sr/jira.issueviews:searchrequest-xml/temp/SearchRequest.xml?jqlQuery=project+%3D+GHS+AND+summary+~+%22As+a+user%22+AND+issuetype+%3D+Story+AND+cf[10653]+%3C+%2220%22+AND+cf[10653]+%3E+%222%22+AND+created+%3E%3D+-20w&amp;tempMax=200&amp;field=key&amp;field=labels&amp;field=summary&amp;field=customfield_10653"
+    rssFeed="https://jira.atlassian.com/sr/jira.issueviews:searchrequest-xml/temp/SearchRequest.xml?jqlQuery=project+%3D+GHS+AND+summary+~+%22As+a+user%22+AND+issuetype+%3D+Story+AND+cf[10653]+%3C+%2220%22+AND+cf[10653]+%3E+%222%22+AND+created+%3E%3D+-20w&amp;tempMax=200&amp;field=key&amp;field=labels&amp;field=summary&amp;field=customfield_10653&amp;field=status"
     storySizeXPath="customfields/customfield[@id='customfield_10653']//customfieldvalue">
     <!-- Public Search URL: https://jira.atlassian.com/issues/?jql=project%20%3D%20GHS%20AND%20summary%20~%20%22As%20a%20user%22%20AND%20issuetype%20%3D%20Story%20AND%20cf[10653]%20%3C%20%2220%22%20AND%20cf[10653]%20%3E%20%222%22%20AND%20created%20%3E%3D%20-20w 
       RSS Feed: https://jira.atlassian.com/sr/jira.issueviews:searchrequest-xml/temp/SearchRequest.xml?jqlQuery=project+%3D+GHS+AND+summary+~+%22As+a+user%22+AND+issuetype+%3D+Story+AND+cf[10653]+%3C+%2220%22+AND+cf[10653]+%3E+%222%22+AND+created+%3E%3D+-20w&amp;tempMax=200&amp;field=key&amp;field=labels&amp;field=summary&amp;field=customfield_10653 -->
@@ -32,7 +32,7 @@
 
   <ProductBacklog
     name="Sample Backlog 2"
-    rssFeed="https://jira.atlassian.com/sr/jira.issueviews:searchrequest-xml/temp/SearchRequest.xml?jqlQuery=project+%3D+GHS+AND+summary+~+%22As+a+user%22+AND+issuetype+%3D+Story+AND+cf[10653]+%3C+%2220%22+AND+cf[10653]+%3E+%222%22+AND+created+%3E%3D+-20w&amp;tempMax=200&amp;field=key&amp;field=labels&amp;field=summary&amp;field=customfield_10653"
+    rssFeed="https://jira.atlassian.com/sr/jira.issueviews:searchrequest-xml/temp/SearchRequest.xml?jqlQuery=project+%3D+GHS+AND+summary+~+%22As+a+user%22+AND+issuetype+%3D+Story+AND+cf[10653]+%3C+%2220%22+AND+cf[10653]+%3E+%222%22+AND+created+%3E%3D+-20w&amp;tempMax=200&amp;field=key&amp;field=labels&amp;field=summary&amp;field=customfield_10653&amp;field=status"
     storySizeXPath="customfields/customfield[@id='customfield_10653']//customfieldvalue">
     <CanvasConfiguration storyWidth="300" markerWidth="145" storySizePixelFactor="20" />
 

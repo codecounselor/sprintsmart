@@ -34,14 +34,25 @@ import javax.xml.xpath.XPathFactory;
 import org.sprintsmart.roadmap.model.Label;
 import org.sprintsmart.roadmap.model.ProductBacklog;
 import org.sprintsmart.roadmap.model.UserStory;
+import org.sprintsmart.roadmap.model.UserStory.Status;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 public class JiraConnector
 {
   private List<UserStory> stories = new ArrayList<UserStory>();  
   private Map<String, Color> label2Color = new HashMap<String,Color>();
+  
+  private static Map<String, Status> jiraStatus2Status = new HashMap<String, Status>();
+  static
+  {
+    jiraStatus2Status.put("Open", Status.OPEN);
+    jiraStatus2Status.put("In Progress", Status.IN_PROGRESS);
+    jiraStatus2Status.put("Complete", Status.COMPLETE);
+    jiraStatus2Status.put("Resolved", Status.COMPLETE);
+  }
   
   public JiraConnector(ProductBacklog productBacklogConfig) 
   {
@@ -71,8 +82,9 @@ public class JiraConnector
       {
         Element jiraItem = (Element) itemNodes.item(i);
         Color storyColor = Color.GRAY;
-        String storyName = jiraItem.getElementsByTagName("key").item(0).getTextContent();
-        String summary = jiraItem.getElementsByTagName("summary").item(0).getTextContent();
+        String storyName = getItemAttribute(jiraItem, "key");
+        String status = getItemAttribute(jiraItem, "status");
+        String summary = getItemAttribute(jiraItem, "summary");
         String storySize = xpath.evaluate(productBacklogConfig.getStorySizeXPath(), jiraItem);
         
         NodeList labels = jiraItem.getElementsByTagName("label");
@@ -93,7 +105,12 @@ public class JiraConnector
         //Don't add a story if it hasn't been estimated
         if( storySize != null && storySize.trim().length() > 0 )
         {
-          stories.add(new UserStory(Double.valueOf(storySize).intValue(), storyColor, storyName, summary, labelList));          
+          int intValue = Double.valueOf(storySize).intValue();
+          //for now we won't render these stories, eventually they can be represented but must extend the sprint/release markers
+          if( intValue > 0 )
+          {
+            stories.add(new UserStory(Double.valueOf(storySize).intValue(), storyColor, storyName, summary, labelList, jiraStatus2Status.get(status)));            
+          }
         }
       }
     } 
@@ -101,6 +118,22 @@ public class JiraConnector
     {
       e.printStackTrace();
     }
+  }
+
+  /**
+   * @param jiraItem
+   * @param string
+   * @return
+   */
+  private String getItemAttribute(Element jiraItem, String attributeName)
+  {
+    String value = "";
+    Node item = jiraItem.getElementsByTagName(attributeName).item(0);
+    if( item != null )
+    {
+      value = item.getTextContent();      
+    }
+    return value;
   }
 
   public List<UserStory> getStories()
