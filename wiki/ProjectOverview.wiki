@@ -10,6 +10,6 @@ The application will generate a visual representation of what your development t
 
   # Display status icons for story pending, in progress, complete
   # Support for user-defined fonts in configuration file
-  # Render Multiple Product Backlogs on one canvas (image)
+  # DONE - Render Multiple Product Backlogs on one canvas (image)
   # Support for command line switch to launch in interactive mode
   # Add Legend
