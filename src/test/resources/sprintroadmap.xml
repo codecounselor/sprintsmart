@@ -17,15 +17,15 @@
     </Sprints>
 
     <LabelThemes>
-      <Label value="Triaged" color="BLUE" />
-      <Label value="blitz" color="ORANGE" />
-      <Label value="must" color="FIREBRICK" />
+      <Label value="Triaged" color="CORAL" />
+      <Label value="blitz"   color="ORANGE" />
+      <Label value="must"    color="FIREBRICK" />
     </LabelThemes>
 
     <VelocityMarkers>
-      <Marker velocity="7" color="LIGHTGREEN" title="Release Deliverables/ @ Velocity=7" label="Release Commit Level" />
-      <Marker velocity="10" color="YELLOW" title="Release Deliverables/ @ Velocity=10" label="Current Delivery Level" />
-      <!-- <Marker velocity="13" color="RED" title="Release Deliverables/ @ Velocity=13" label="Potential Delivery Level" /> -->
+      <Marker velocity="3" color="LIGHTGREEN" title="Release Deliverables/ @ Velocity=3" label="Release Commit Level" />
+      <Marker velocity="5" color="YELLOW" title="Release Deliverables/ @ Velocity=5" label="Current Delivery Level" />
+      <Marker velocity="7" color="RED" title="Release Deliverables/ @ Velocity=7" label="Potential Delivery Level" />
     </VelocityMarkers>
 
   </ProductBacklog>
@@ -44,14 +44,14 @@
     </Sprints>
 
     <LabelThemes>
-      <Label value="Triaged" color="BLUE" />
+      <Label value="Triaged" color="DARKKHAKI" />
       <Label value="blitz" color="ORANGE" />
       <Label value="must" color="FIREBRICK" />
     </LabelThemes>
 
     <VelocityMarkers>
-      <Marker velocity="7" color="BLUE" title="Release Deliverables/ @ Velocity=7" label="Release Commit Level" />
-      <Marker velocity="10" color="ORANGE" title="Release Deliverables/ @ Velocity=10" label="Current Delivery Level" />
+      <Marker velocity="8" color="BLUE" title="Release Deliverables/ @ Velocity=8" label="Release Commit Level" />
+      <Marker velocity="12" color="ORANGE" title="Release Deliverables/ @ Velocity=11" label="Current Delivery Level" />
     </VelocityMarkers>
 
   </ProductBacklog>
