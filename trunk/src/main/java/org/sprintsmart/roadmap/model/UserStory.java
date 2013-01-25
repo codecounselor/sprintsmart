@@ -18,6 +18,7 @@ package org.sprintsmart.roadmap.model;
 
 import java.util.List;
 
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
 /**
@@ -31,14 +32,35 @@ public class UserStory
   private String text;
   private String summary;
   private List<String> labels;
+  private Image statusImage;
+  
+  private static Image statusImgNotStarted;
+  private static Image statusImgInProgress;
+  private static Image statusImgComplete;
+  
+  static
+  {
+    statusImgNotStarted = new Image(UserStory.class.getResourceAsStream("/img/red_light.png"));
+    statusImgInProgress = new Image(UserStory.class.getResourceAsStream("/img/yellow_light.png"));
+    statusImgComplete = new Image(UserStory.class.getResourceAsStream("/img/green_light.png"));
+//    statusImgNotStarted = new Image(UserStory.class.getResourceAsStream("/img/traffic_light_red.png"));
+//    statusImgInProgress = new Image(UserStory.class.getResourceAsStream("/img/traffic_light_yellow.png"));
+//    statusImgComplete = new Image(UserStory.class.getResourceAsStream("/img/traffic_light_green.png"));
+  }
+  public static enum Status
+  {
+    OPEN, IN_PROGRESS, COMPLETE;    
+  }
 
-  public UserStory(int size, Color color, String text, String summary, List<String> labels) 
+  public UserStory(int size, Color color, String text, String summary, List<String> labels, Status status) 
   {
     this.size = size;
     this.color = color;
     this.text = text;
     this.summary = summary;
     this.labels = labels;
+    this.statusImage = status == Status.COMPLETE ? statusImgComplete : 
+                       status == Status.IN_PROGRESS ? statusImgInProgress : statusImgNotStarted;
   }
 
   public String getText()
@@ -70,6 +92,14 @@ public class UserStory
   public Color getColor()
   {
     return color;
+  }
+  
+  /**
+   * @return the statusImage
+   */
+  public Image getStatusImage()
+  {
+    return statusImage;
   }
 
 }

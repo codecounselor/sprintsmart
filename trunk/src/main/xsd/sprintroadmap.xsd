@@ -20,6 +20,7 @@
         </xs:element>
         <xs:element ref="VelocityMarkers"/>
       </xs:sequence>
+      <xs:attribute name="name" use="optional" type="xs:string"/>
       <xs:attribute name="rssFeed" use="required" type="xs:string"/>
       <xs:attribute name="storySizeXPath" use="required" type="xs:string"/>
     </xs:complexType>
