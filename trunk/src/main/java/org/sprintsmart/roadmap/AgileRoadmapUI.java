@@ -19,6 +19,8 @@ package org.sprintsmart.roadmap;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import javafx.application.Application;
@@ -46,7 +48,9 @@ import org.sprintsmart.roadmap.model.ProductBacklog;
 import org.sprintsmart.roadmap.model.Sprint;
 import org.sprintsmart.roadmap.model.SprintRoadmap;
 import org.sprintsmart.roadmap.model.SprintRoadmapConfiguration;
+import org.sprintsmart.roadmap.model.StoryStatus;
 import org.sprintsmart.roadmap.model.UserStory;
+import org.sprintsmart.roadmap.model.VelocityAdjustment;
 
 /**
  * 
@@ -108,8 +112,15 @@ public class AgileRoadmapUI extends Application
       int maxHeight = 0;
       for( ProductBacklog productBacklog : roadmap.getProductBacklog() )
       {            
-        List<UserStory> stories = new JiraConnector(productBacklog).getStories();
-        canvasConfig = new CanvasContext(stories, productBacklog.getVelocityMarkers().getMarker(), productBacklog.getCanvasConfiguration(), startingXPos);
+        BacklogContext backlogContext = new BacklogContext(productBacklog);
+        List<UserStory> stories = new JiraConnector(backlogContext).getStories();
+        List<Sprint> sprintList = productBacklog.getSprints().getSprint();
+        List<Marker> velocities = productBacklog.getVelocityMarkers().getMarker();
+        
+        int lowestVelocity = getLowestVelocity(velocities);        
+        stories = addVelocityAdjustmentStories(backlogContext, stories, sprintList, lowestVelocity);
+        
+        canvasConfig = new CanvasContext(stories, velocities, productBacklog.getCanvasConfiguration(), startingXPos);
         int requiredWidth = canvasConfig.getWidth();
         int requiredHeight = canvasConfig.getHeight();
         
@@ -124,7 +135,7 @@ public class AgileRoadmapUI extends Application
         textGraphicsContext.setFont(canvasConfig.defaultFont);
         textGraphicsContext.setFill(Color.BLACK);
         
-        drawMarkers(sprintMarkerCanvas.getGraphicsContext2D(), canvasConfig.getMarkers(), productBacklog.getSprints().getSprint());
+        drawMarkers(sprintMarkerCanvas.getGraphicsContext2D(), canvasConfig.getMarkers(), sprintList);
         drawStories(storyCanvas.getGraphicsContext2D(), canvasConfig.getStories(), productBacklog.getName());
         
         List<Canvas> canvasList = new ArrayList<Canvas>();
@@ -168,11 +179,71 @@ public class AgileRoadmapUI extends Application
     catch (Exception e)
     {
       e.printStackTrace();
+      System.exit(0);
     } 
     finally
     {
-      //System.exit(0);
     }
+  }
+
+  /**
+   * @param velocities
+   * @return
+   */
+  private int getLowestVelocity(List<Marker> velocities)
+  {
+    int lowValue = 0;
+    for( Marker m : velocities )
+    {
+      if( lowValue == 0 )
+      {
+        lowValue = m.getVelocity();
+      }
+      else
+      {
+        lowValue = Math.min(lowValue, m.getVelocity());        
+      }
+    }
+    return lowValue;
+  }
+
+  /**
+   * @param backlogContext 
+   * @param stories
+   * @param sprintList
+   * @param velocity - This is the velocity value that will be used to place velocity adjustments into the backlog
+   */
+  private List<UserStory> addVelocityAdjustmentStories(BacklogContext backlogContext, List<UserStory> stories, List<Sprint> sprintList, int velocity)
+  {
+    List<UserStory> allStories = new ArrayList<UserStory>();
+    Iterator<UserStory> storyIterator = stories.iterator();
+
+    String label = "VelocityAdjustment";
+    List<String> labelList = Arrays.asList(label);
+    
+    int totalStorySize = 0;
+    while( storyIterator.hasNext() )
+    {
+      //Add the adjustment stories, if the backlog runs past the sprints defined then we must stop
+      int sprintIndex = totalStorySize / velocity;
+      if( sprintIndex < sprintList.size() )
+      {
+        Sprint activeSprint = sprintList.get(sprintIndex);
+        Iterator<VelocityAdjustment> adjustments = activeSprint.getVelocityAdjustment().iterator();
+        while( adjustments.hasNext() )
+        {
+          VelocityAdjustment a = adjustments.next();
+          totalStorySize += a.getPointValue();
+          allStories.add(new UserStory(a.getPointValue(), backlogContext.getColorForLabel(label), a.getTitle(), a.getDescription(), labelList, StoryStatus.parse(a.getStatus())));
+          adjustments.remove();
+        }    
+      }
+      //Add the next story in the backlog
+      UserStory story = storyIterator.next();
+      allStories.add(story);
+      totalStorySize += story.getSize();
+    }
+    return allStories;
   }
 
   private void drawStories(GraphicsContext gc, List<UserStory> userStories, String header)
