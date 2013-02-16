@@ -47,20 +47,15 @@ public class UserStory
 //    statusImgInProgress = new Image(UserStory.class.getResourceAsStream("/img/traffic_light_yellow.png"));
 //    statusImgComplete = new Image(UserStory.class.getResourceAsStream("/img/traffic_light_green.png"));
   }
-  public static enum Status
-  {
-    OPEN, IN_PROGRESS, COMPLETE;    
-  }
-
-  public UserStory(int size, Color color, String text, String summary, List<String> labels, Status status) 
+  public UserStory(int size, Color color, String text, String summary, List<String> labels, StoryStatus status) 
   {
     this.size = size;
     this.color = color;
     this.text = text;
     this.summary = summary;
     this.labels = labels;
-    this.statusImage = status == Status.COMPLETE ? statusImgComplete : 
-                       status == Status.IN_PROGRESS ? statusImgInProgress : statusImgNotStarted;
+    this.statusImage = status == StoryStatus.COMPLETE ? statusImgComplete : 
+                       status == StoryStatus.IN_PROGRESS ? statusImgInProgress : statusImgNotStarted;
   }
 
   public String getText()

@@ -11,15 +11,19 @@
 
     <Sprints>
       <Sprint startDate="2013-01-09" endDate="2013-01-29" label="Sprint 13.01" />
-      <Sprint startDate="2013-01-30" endDate="2013-02-19" label="Sprint 13.02" />
+      <Sprint startDate="2013-01-30" endDate="2013-02-19" label="Sprint 13.02" >
+      </Sprint>
       <Sprint startDate="2013-02-20" endDate="2013-03-12" label="Sprint 13.03" />
-      <Sprint startDate="2013-03-13" endDate="2013-04-02" label="Sprint 13.04" />
+      <Sprint startDate="2013-03-13" endDate="2013-04-02" label="Sprint 13.04" >
+        <VelocityAdjustment title="Release Preparation" description="Effort to perform a release" pointValue="5" status="In_Progress"/>
+      </Sprint>
     </Sprints>
 
     <LabelThemes>
       <Label value="Triaged" color="CORAL" />
       <Label value="blitz"   color="ORANGE" />
-      <Label value="must"    color="FIREBRICK" />
+      <Label value="must"    color="GREEN" />
+      <Label value="VelocityAdjustment" color="RED" />
     </LabelThemes>
 
     <VelocityMarkers>

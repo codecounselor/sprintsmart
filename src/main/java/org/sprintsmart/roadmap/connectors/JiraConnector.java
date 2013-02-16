@@ -31,10 +31,10 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathFactory;
 
-import org.sprintsmart.roadmap.model.Label;
+import org.sprintsmart.roadmap.BacklogContext;
 import org.sprintsmart.roadmap.model.ProductBacklog;
+import org.sprintsmart.roadmap.model.StoryStatus;
 import org.sprintsmart.roadmap.model.UserStory;
-import org.sprintsmart.roadmap.model.UserStory.Status;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -43,31 +43,20 @@ import org.w3c.dom.NodeList;
 public class JiraConnector
 {
   private List<UserStory> stories = new ArrayList<UserStory>();  
-  private Map<String, Color> label2Color = new HashMap<String,Color>();
   
-  private static Map<String, Status> jiraStatus2Status = new HashMap<String, Status>();
+  
+  private static Map<String, StoryStatus> jiraStatus2Status = new HashMap<String, StoryStatus>();
   static
   {
-    jiraStatus2Status.put("Open", Status.OPEN);
-    jiraStatus2Status.put("In Progress", Status.IN_PROGRESS);
-    jiraStatus2Status.put("Complete", Status.COMPLETE);
-    jiraStatus2Status.put("Resolved", Status.COMPLETE);
+    jiraStatus2Status.put("Open", StoryStatus.OPEN);
+    jiraStatus2Status.put("In Progress", StoryStatus.IN_PROGRESS);
+    jiraStatus2Status.put("Complete", StoryStatus.COMPLETE);
+    jiraStatus2Status.put("Resolved", StoryStatus.COMPLETE);
   }
   
-  public JiraConnector(ProductBacklog productBacklogConfig) 
-  {
-    for( Label label : productBacklogConfig.getLabelThemes().getLabel() )
-    {
-      if( label.getColor() != null )
-      {
-        label2Color.put(label.getValue(), Color.valueOf(label.getColor()));        
-      }
-      else if( label.getWebColor() != null )
-      {
-        label2Color.put(label.getValue(), Color.web(label.getWebColor()));        
-      }
-    }
-    
+  public JiraConnector(BacklogContext backlogContext) 
+  {    
+    ProductBacklog productBacklogConfig = backlogContext.getBacklog();
     try
     {
       XPath xpath = XPathFactory.newInstance().newXPath();
@@ -95,9 +84,10 @@ public class JiraConnector
           {
             String label = labels.item(l).getTextContent();
             labelList.add(label);
-            if( label2Color.containsKey(label) )
+            Color colorForLabel = backlogContext.getColorForLabel(label);
+            if( colorForLabel != null )
             {
-              storyColor = label2Color.get(label);
+              storyColor = colorForLabel;
             }
           }
         }
