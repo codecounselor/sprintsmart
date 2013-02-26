@@ -72,6 +72,8 @@ public class AgileRoadmapUI extends Application
 
   SprintRoadmapConfiguration config;
   int currentStoryYPos;
+  boolean interactiveMode = false;
+  
 
   /**
    * The main() method is ignored in correctly deployed JavaFX application.
@@ -95,6 +97,10 @@ public class AgileRoadmapUI extends Application
   {
     List<String> params = getParameters().getRaw();
     String configFile = params.get(0); //"configFile"
+    if( params.size() > 1 )
+    {
+      interactiveMode = Boolean.parseBoolean(params.get(1));      
+    }
     config = new SprintRoadmapConfiguration(configFile);
   }
 
@@ -163,26 +169,38 @@ public class AgileRoadmapUI extends Application
       scrollPane.setPrefSize(1200, 800);
       scrollPane.setContent(root);
 
-      // This doesn't render to a file correctly
-      //Scene theScene = new Scene(scrollPane);
-
-      Scene theScene = new Scene(root);
+      Scene theScene;
+      if( interactiveMode )
+      {
+        theScene = new Scene(scrollPane);        
+      }
+      else
+      {
+        theScene = new Scene(root);
+      }
 
       primaryStage.setScene(theScene);
       primaryStage.show();
 
-      WritableImage image = new WritableImage(startingXPos, maxHeight);
-      theScene.snapshot(image);
-      File file = new File(roadmap.getImageFileName());
-      ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);      
+      if( !interactiveMode )
+      {
+        WritableImage image = new WritableImage(startingXPos, maxHeight);
+        theScene.snapshot(image);
+        File file = new File(roadmap.getImageFileName());
+        ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);        
+      }
     } 
     catch (Exception e)
     {
       e.printStackTrace();
-      System.exit(0);
+      System.exit(0);        
     } 
     finally
     {
+      if( !interactiveMode )
+      {
+        System.exit(0);        
+      }
     }
   }
 
