@@ -52,6 +52,7 @@ public class JiraConnector
     jiraStatus2Status.put("In Progress", StoryStatus.IN_PROGRESS);
     jiraStatus2Status.put("Complete", StoryStatus.COMPLETE);
     jiraStatus2Status.put("Resolved", StoryStatus.COMPLETE);
+    jiraStatus2Status.put("Closed", StoryStatus.COMPLETE);
   }
   
   public JiraConnector(BacklogContext backlogContext) 
