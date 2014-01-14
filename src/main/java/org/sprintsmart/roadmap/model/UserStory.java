@@ -54,7 +54,7 @@ public class UserStory
     this.text = text;
     this.summary = summary;
     this.labels = labels;
-    this.statusImage = status == StoryStatus.COMPLETE || status == StoryStatus.CLOSED ? statusImgComplete : 
+    this.statusImage = status == StoryStatus.COMPLETE ? statusImgComplete : 
                        status == StoryStatus.IN_PROGRESS ? statusImgInProgress : statusImgNotStarted;
   }
 
