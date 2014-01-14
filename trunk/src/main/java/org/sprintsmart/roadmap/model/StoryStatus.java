@@ -18,7 +18,7 @@ package org.sprintsmart.roadmap.model;
 
 public enum StoryStatus
 {
-  OPEN, IN_PROGRESS, COMPLETE;
+  OPEN, IN_PROGRESS, COMPLETE, CLOSED;
   
   public static StoryStatus parse(String statusText)
   {
